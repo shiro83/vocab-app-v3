@@ -46,26 +46,26 @@
           <li
             v-for="word in words"
             :key="word.id"
-            class="bg-gradient-to-r from-white to-gray-50 rounded-2xl shadow-xl p-5 flex justify-between items-center hover:scale-[1.02] hover:shadow-2xl transition-all duration-300"
+            class="bg-white rounded-xl shadow-md p-4 flex justify-between items-center"
           >
             <div>
-              <p class="text-xl font-bold text-gray-800">{{ word.text }}</p>
+              <p class="text-gray-800 font-medium text-base">{{ word.text }}</p>
               <p class="text-gray-500 text-sm">{{ word.meaning }}</p>
             </div>
             <div class="flex space-x-2">
               <button
                 @click="markMemorized(word.id)"
-                class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-full shadow"
-                title="暗記済みにする"
+                class="bg-green-500 text-white px-3 py-1 rounded-full text-sm hover:bg-green-600 transition"
+                title="覚えた"
               >
                 ✅
               </button>
               <button
                 @click="deleteWord(word.id)"
-                class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-full shadow"
+                class="bg-red-500 text-white px-3 py-1 rounded-full text-sm hover:bg-red-600 transition"
                 title="削除"
               >
-                🗑️
+                🗑
               </button>
             </div>
           </li>
@@ -79,23 +79,31 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, watch } from "vue";
 import { useWords } from "~/composables/useWords";
+import { useAuth } from "~/composables/useAuth";
 
-const { words, addWord, loadWords, markMemorized, deleteWord } = useWords();
+const { words, loadWords, addWord, deleteWord, markMemorized } = useWords();
+const { user } = useAuth();
+
 const text = ref("");
 const meaning = ref("");
 
-// 画面表示時に一覧自動読み込み
-onMounted(async () => {
-  await loadWords();
+// ユーザー情報が確定したら単語をロードする
+watch(user, (newUser) => {
+  if (newUser) {
+    loadWords();
+  } else {
+    words.value = [];
+  }
 });
 
+// 単語追加処理
 const addNewWord = async () => {
   if (!text.value || !meaning.value) return;
   await addWord(text.value, meaning.value);
   text.value = "";
   meaning.value = "";
-  await loadWords(); // 保存後に一覧更新
+  await loadWords();
 };
 </script>
