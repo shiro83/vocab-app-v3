@@ -1,5 +1,6 @@
 import { ref } from "vue";
 import {
+  db,
   collection,
   addDoc,
   deleteDoc,
@@ -10,8 +11,7 @@ import {
   orderBy,
   updateDoc,
   Timestamp,
-} from "firebase/firestore";
-import { db } from "~/lib/firebase";
+} from "~/lib/firebase";
 import { useAuth } from "~/composables/useAuth";
 
 const words = ref<any[]>([]);

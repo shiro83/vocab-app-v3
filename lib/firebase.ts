@@ -1,11 +1,25 @@
+// ~/lib/firebase.ts
 import { initializeApp } from "firebase/app";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  deleteDoc,
+  doc,
+  getDocs,
+  where,
+  orderBy,
+  query,
+  Timestamp,
+  updateDoc,
+} from "firebase/firestore";
 import {
   getAuth,
   GoogleAuthProvider,
+  onAuthStateChanged,
   signInWithPopup,
   signOut,
 } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBAq7Z3BnWW3HCIz6opwfNPlrQeeTdSO4Q",
@@ -17,9 +31,30 @@ const firebaseConfig = {
   measurementId: "G-DMWFNLKCDV",
 };
 
+// Firebase 初期化
 const app = initializeApp(firebaseConfig);
 
-export const auth = getAuth(app);
-export const provider = new GoogleAuthProvider();
-export const db = getFirestore(app);
-export { signInWithPopup, signOut };
+// Firestore, Auth, Provider を取得
+const db = getFirestore(app);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+
+// 明示的に使用する関数も再エクスポート
+export {
+  db,
+  auth,
+  provider,
+  collection,
+  addDoc,
+  deleteDoc,
+  doc,
+  getDocs,
+  orderBy,
+  where,
+  query,
+  Timestamp,
+  updateDoc,
+  onAuthStateChanged,
+  signInWithPopup,
+  signOut,
+};

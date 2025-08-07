@@ -1,3 +1,4 @@
+// tests/setup.ts
 import { vi } from "vitest";
 
 // firebase/auth のモック
@@ -41,6 +42,7 @@ vi.mock("~/lib/firebase", () => {
       ],
     })),
     orderBy: vi.fn(),
+    where: vi.fn((...args) => args),
     query: vi.fn(),
     Timestamp: {
       fromDate: vi.fn(() => "mock-timestamp"),
