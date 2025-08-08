@@ -1,3 +1,4 @@
+//useWords.spec.ts;
 import { useWords } from "~/composables/useWords";
 
 describe("useWords", () => {

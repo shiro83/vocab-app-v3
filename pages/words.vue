@@ -17,7 +17,7 @@
           <input
             v-model="text"
             type="text"
-            placeholder="単語"
+            placeholder="英単語"
             required
             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
@@ -82,6 +82,7 @@
 import { ref, watch } from "vue";
 import { useWords } from "~/composables/useWords";
 import { useAuth } from "~/composables/useAuth";
+import WordsList from '~/composables/WordsList.vue';
 
 const { words, loadWords, addWord, deleteWord, markMemorized } = useWords();
 const { user } = useAuth();
