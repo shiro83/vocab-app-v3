@@ -1,5 +1,7 @@
+// composables/useWords.ts
 import { ref } from "vue";
 import {
+  db,
   collection,
   addDoc,
   deleteDoc,
@@ -10,11 +12,12 @@ import {
   orderBy,
   updateDoc,
   Timestamp,
-} from "firebase/firestore";
-import { db } from "~/lib/firebase";
+} from "~/lib/firebase";
 import { useAuth } from "~/composables/useAuth";
 
+// 単一インスタンスの状態
 const words = ref<any[]>([]);
+let initialized = false; // 初回ロード判定
 
 export function useWords() {
   const { user } = useAuth();
@@ -27,11 +30,12 @@ export function useWords() {
       orderBy("createdAt", "desc")
     );
     const snapshot = await getDocs(q);
-    words.value =
-      snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) ?? [];
+    words.value = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    console.log(words);
   }
 
   async function addWord(text: string, meaning: string) {
@@ -40,7 +44,7 @@ export function useWords() {
       text,
       meaning,
       memorized: false,
-      createdAt: Timestamp.fromDate(new Date()), // ここを修正
+      createdAt: Timestamp.fromDate(new Date()),
       userId: user.value.uid,
     });
     await loadWords();
@@ -54,10 +58,14 @@ export function useWords() {
 
   async function markMemorized(id: string) {
     if (!user.value) throw new Error("未ログイン");
-    await updateDoc(doc(db, "words", id), {
-      memorized: true,
-    });
+    await updateDoc(doc(db, "words", id), { memorized: true });
     await loadWords();
+  }
+
+  // ページに入った瞬間1回だけロード
+  if (!initialized && user.value) {
+    initialized = true;
+    loadWords();
   }
 
   return {
