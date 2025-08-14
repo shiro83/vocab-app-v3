@@ -1,74 +1,92 @@
-<!-- components/WordForm.vue -->
 <template>
   <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
     <h2 class="text-xl font-semibold text-gray-700 mb-4 flex items-center">
       <span class="mr-2">➕</span>新しい単語を追加
     </h2>
     <form @submit.prevent="handleSubmit" class="space-y-4">
-      <FormInput
-        v-model="text"
-        placeholder="英単語"
-        :error="textError"
-        :disabled="isLoading"
-        @input="validateText"
-        required
-      />
-      <FormInput
-        v-model="meaning"
-        placeholder="意味"
-        :disabled="isLoading"
-        required
-      />
-      <FormButton type="submit" :disabled="!canSubmit" :loading="isLoading">
-        💾 保存
-      </FormButton>
+      <div class="relative">
+        <input
+          v-model.trim="text"
+          type="text"
+          placeholder="英単語"
+          required
+          :disabled="isLoading"
+          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
+          @input="validateInput"
+        />
+        <div v-if="inputError" class="text-red-500 text-sm mt-1">
+          {{ inputError }}
+        </div>
+      </div>
+      <div class="relative">
+        <input
+          v-model.trim="meaning"
+          type="text"
+          placeholder="意味"
+          required
+          :disabled="isLoading"
+          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
+        />
+      </div>
+      <button
+        type="submit"
+        :disabled="isLoading || !text || !meaning || !!inputError"
+        class="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white py-3 rounded-lg shadow hover:from-blue-600 hover:to-purple-600 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+      >
+        <span v-if="!isLoading" class="mr-2">💾</span>
+        <span v-if="isLoading" class="mr-2">⏳</span>
+        {{ isLoading ? "保存中..." : "保存" }}
+      </button>
     </form>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import type { Word } from "~/types/word";
+import { ref, watch } from "vue";
 
-const props = defineProps<{
-  isLoading: boolean;
-  existingWords: Word[];
-}>();
+interface Props {
+  existingWords: Array<{ text: string }>;
+}
 
-const emit = defineEmits<{
-  addWord: [text: string, meaning: string];
-}>();
+interface Emits {
+  (e: "add-word", text: string, meaning: string): void;
+}
+
+const props = defineProps<Props>();
+const emit = defineEmits<Emits>();
 
 const text = ref("");
 const meaning = ref("");
-const textError = ref("");
+const isLoading = ref(false);
+const inputError = ref("");
 
-const canSubmit = computed(
-  () =>
-    text.value.trim() &&
-    meaning.value.trim() &&
-    !textError.value &&
-    !props.isLoading
-);
-
-const validateText = () => {
+const validateInput = () => {
   if (
     text.value &&
     props.existingWords.some(
       (word) => word.text.toLowerCase() === text.value.toLowerCase()
     )
   ) {
-    textError.value = "この単語は既に登録されています";
+    inputError.value = "この単語は既に登録されています";
   } else {
-    textError.value = "";
+    inputError.value = "";
   }
 };
 
-const handleSubmit = () => {
-  if (!canSubmit.value) return;
-  emit("addWord", text.value.trim(), meaning.value.trim());
-  text.value = "";
-  meaning.value = "";
-  textError.value = "";
+const handleSubmit = async () => {
+  if (!text.value || !meaning.value || inputError.value) return;
+
+  isLoading.value = true;
+  try {
+    emit("add-word", text.value, meaning.value);
+    text.value = "";
+    meaning.value = "";
+    inputError.value = "";
+  } finally {
+    isLoading.value = false;
+  }
 };
+
+// テキストが変更されたときにバリデーションを実行
+watch(() => props.existingWords, validateInput);
 </script>

@@ -1,88 +1,18 @@
-<!-- pages/words.vue -  -->
 <template>
   <div class="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50">
     <!-- ヘッダー -->
-    <!-- 元のコード（削除） -->
-    <!-- 
-<header class="bg-gradient-to-r from-blue-500 to-purple-600 text-white py-4 shadow">
-  <div class="max-w-2xl mx-auto px-6 flex justify-between items-center">
-    <h1 class="text-3xl font-bold">📘 単語暗記帳</h1>
-    <div class="text-sm">📊 {{ words.length }}語登録済み</div>
-  </div>
-</header>
--->
-
-    <!-- 新しいコンポーネントの使用 -->
     <WordHeader :word-count="words.length" />
 
     <main class="max-w-2xl mx-auto p-6">
       <!-- 統計情報 -->
-      <!-- 元のコード（削除） -->
-      <!-- 
-<div class="grid grid-cols-3 gap-4 mb-6">
-  <div class="bg-white rounded-lg p-4 text-center shadow">
-    <div class="text-2xl font-bold text-blue-600">{{ words.length }}</div>
-    <div class="text-sm text-gray-600">総単語数</div>
-  </div>
-  <div class="bg-white rounded-lg p-4 text-center shadow">
-    <div class="text-2xl font-bold text-green-600">{{ memorizedCount }}</div>
-    <div class="text-sm text-gray-600">習得済み</div>
-  </div>
-  <div class="bg-white rounded-lg p-4 text-center shadow">
-    <div class="text-2xl font-bold text-orange-600">{{ studyingCount }}</div>
-    <div class="text-sm text-gray-600">学習中</div>
-  </div>
-</div>
--->
-
-      <!-- 新しいコンポーネントの使用 -->
       <WordStats
         :total-count="words.length"
         :memorized-count="memorizedCount"
         :studying-count="studyingCount"
       />
 
-      <!-- 単語追加フォーム -->
-      <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
-        <h2 class="text-xl font-semibold text-gray-700 mb-4 flex items-center">
-          <span class="mr-2">➕</span>新しい単語を追加
-        </h2>
-        <form @submit.prevent="addNewWord" class="space-y-4">
-          <div class="relative">
-            <input
-              v-model.trim="text"
-              type="text"
-              placeholder="英単語"
-              required
-              :disabled="isLoading"
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
-              @input="validateInput"
-            />
-            <div v-if="inputError" class="text-red-500 text-sm mt-1">
-              {{ inputError }}
-            </div>
-          </div>
-          <div class="relative">
-            <input
-              v-model.trim="meaning"
-              type="text"
-              placeholder="意味"
-              required
-              :disabled="isLoading"
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
-            />
-          </div>
-          <button
-            type="submit"
-            :disabled="isLoading || !text || !meaning || !!inputError"
-            class="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white py-3 rounded-lg shadow hover:from-blue-600 hover:to-purple-600 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-          >
-            <span v-if="!isLoading" class="mr-2">💾</span>
-            <span v-if="isLoading" class="mr-2">⏳</span>
-            {{ isLoading ? "保存中..." : "保存" }}
-          </button>
-        </form>
-      </div>
+      <!-- 単語追加フォーム） -->
+      <WordForm :existing-words="words" @add-word="handleAddWord" />
 
       <!-- フィルター・検索 -->
       <div class="bg-white rounded-xl shadow-md p-4 mb-6">
@@ -263,32 +193,11 @@
     </main>
 
     <!-- 削除確認モーダル -->
-    <div
-      v-if="wordToDelete"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-    >
-      <div class="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
-        <h3 class="text-lg font-semibold mb-4">削除確認</h3>
-        <p class="text-gray-600 mb-6">
-          「{{ wordToDelete.text }}」を削除しますか？<br />
-          この操作は取り消せません。
-        </p>
-        <div class="flex space-x-4">
-          <button
-            @click="executeDelete"
-            class="flex-1 bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 transition"
-          >
-            削除
-          </button>
-          <button
-            @click="wordToDelete = null"
-            class="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400 transition"
-          >
-            キャンセル
-          </button>
-        </div>
-      </div>
-    </div>
+    <DeleteModal
+      :word-to-delete="wordToDelete"
+      @confirm-delete="executeDelete"
+      @cancel="wordToDelete = null"
+    />
   </div>
 </template>
 
@@ -296,6 +205,8 @@
 import { ref, computed, watch, onMounted } from "vue";
 import WordHeader from "~/components/WordHeader.vue";
 import WordStats from "~/components/WordStats.vue";
+import WordForm from "~/components/WordForm.vue";
+import DeleteModal from "~/components/DeleteModal.vue";
 import { useWords } from "~/composables/useWords";
 import { useAuth } from "~/composables/useAuth";
 
@@ -330,11 +241,23 @@ const studyingCount = computed(
   () => words.value.filter((word) => !word.memorized).length
 );
 
-// フィルタリング（シンプル版）
+// 単語登録
+const handleAddWord = async (text: string, meaning: string) => {
+  console.log("handleAddWord called:", { text, meaning }); // デバッグ用
+  try {
+    await addWord(text, meaning);
+    await loadWords();
+    console.log("Word added successfully"); // デバッグ用
+  } catch (error) {
+    console.error("Error adding word:", error);
+    alert("単語の追加に失敗しました");
+  }
+};
+
+// フィルタリング
 const displayWords = computed(() => {
   let filtered = words.value;
 
-  // 検索フィルター
   if (searchQuery.value.trim()) {
     const query = searchQuery.value.toLowerCase().trim();
     filtered = filtered.filter(
@@ -344,7 +267,6 @@ const displayWords = computed(() => {
     );
   }
 
-  // ステータスフィルター
   if (filterStatus.value === "studying") {
     filtered = filtered.filter((word) => !word.memorized);
   } else if (filterStatus.value === "memorized") {
@@ -372,7 +294,6 @@ onMounted(async () => {
   }
 });
 
-// ユーザー情報が確定したら単語をロードする
 watch(user, async (newUser) => {
   if (newUser) {
     await loadWords();
@@ -381,7 +302,6 @@ watch(user, async (newUser) => {
   }
 });
 
-// 検索・フィルター変更時にページをリセット
 watch([searchQuery, filterStatus], () => {
   currentPage.value = 1;
 });
@@ -419,7 +339,7 @@ const addNewWord = async () => {
   }
 };
 
-// 習得状態の切り替え
+// その他の関数
 const toggleMemorized = async (word: any) => {
   try {
     await markMemorized(word.id);
@@ -430,7 +350,6 @@ const toggleMemorized = async (word: any) => {
   }
 };
 
-// 削除確認
 const confirmDelete = (word: any) => {
   wordToDelete.value = word;
 };
@@ -448,7 +367,6 @@ const executeDelete = async () => {
   }
 };
 
-// 一括操作
 const bulkMarkMemorized = async () => {
   try {
     for (const wordId of selectedWords.value) {
@@ -479,14 +397,12 @@ const bulkDelete = async () => {
   }
 };
 
-// フィルタークリア
 const clearFilters = () => {
   searchQuery.value = "";
   filterStatus.value = "all";
   currentPage.value = 1;
 };
 
-// 日付フォーマット
 const formatDate = (date: string | Date) => {
   return new Date(date).toLocaleDateString("ja-JP");
 };

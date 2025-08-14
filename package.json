@@ -8,6 +8,7 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
+    "dp": "firebase deploy --only hosting",
     "test": "vitest"
   },
   "dependencies": {
