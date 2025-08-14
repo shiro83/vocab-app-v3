@@ -53,7 +53,9 @@ pnpm build
 yarn build
 
 # bun
-bun run build
+npm run build
+firebase deploy --only hosting
+
 ```
 
 Locally preview production build:

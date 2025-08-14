@@ -1,36 +1,46 @@
-<!-- pages/words.vue - 動作確認済み改善版 -->
+<!-- pages/words.vue -  -->
 <template>
   <div class="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50">
     <!-- ヘッダー -->
-    <header
-      class="bg-gradient-to-r from-blue-500 to-purple-600 text-white py-4 shadow"
-    >
-      <div class="max-w-2xl mx-auto px-6 flex justify-between items-center">
-        <h1 class="text-3xl font-bold">📘 単語暗記帳</h1>
-        <div class="text-sm">📊 {{ words.length }}語登録済み</div>
-      </div>
-    </header>
+    <!-- 元のコード（削除） -->
+    <!-- 
+<header class="bg-gradient-to-r from-blue-500 to-purple-600 text-white py-4 shadow">
+  <div class="max-w-2xl mx-auto px-6 flex justify-between items-center">
+    <h1 class="text-3xl font-bold">📘 単語暗記帳</h1>
+    <div class="text-sm">📊 {{ words.length }}語登録済み</div>
+  </div>
+</header>
+-->
+
+    <!-- 新しいコンポーネントの使用 -->
+    <WordHeader :word-count="words.length" />
 
     <main class="max-w-2xl mx-auto p-6">
       <!-- 統計情報 -->
-      <div class="grid grid-cols-3 gap-4 mb-6">
-        <div class="bg-white rounded-lg p-4 text-center shadow">
-          <div class="text-2xl font-bold text-blue-600">{{ words.length }}</div>
-          <div class="text-sm text-gray-600">総単語数</div>
-        </div>
-        <div class="bg-white rounded-lg p-4 text-center shadow">
-          <div class="text-2xl font-bold text-green-600">
-            {{ memorizedCount }}
-          </div>
-          <div class="text-sm text-gray-600">習得済み</div>
-        </div>
-        <div class="bg-white rounded-lg p-4 text-center shadow">
-          <div class="text-2xl font-bold text-orange-600">
-            {{ studyingCount }}
-          </div>
-          <div class="text-sm text-gray-600">学習中</div>
-        </div>
-      </div>
+      <!-- 元のコード（削除） -->
+      <!-- 
+<div class="grid grid-cols-3 gap-4 mb-6">
+  <div class="bg-white rounded-lg p-4 text-center shadow">
+    <div class="text-2xl font-bold text-blue-600">{{ words.length }}</div>
+    <div class="text-sm text-gray-600">総単語数</div>
+  </div>
+  <div class="bg-white rounded-lg p-4 text-center shadow">
+    <div class="text-2xl font-bold text-green-600">{{ memorizedCount }}</div>
+    <div class="text-sm text-gray-600">習得済み</div>
+  </div>
+  <div class="bg-white rounded-lg p-4 text-center shadow">
+    <div class="text-2xl font-bold text-orange-600">{{ studyingCount }}</div>
+    <div class="text-sm text-gray-600">学習中</div>
+  </div>
+</div>
+-->
+
+      <!-- 新しいコンポーネントの使用 -->
+      <WordStats
+        :total-count="words.length"
+        :memorized-count="memorizedCount"
+        :studying-count="studyingCount"
+      />
 
       <!-- 単語追加フォーム -->
       <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
@@ -284,6 +294,8 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from "vue";
+import WordHeader from "~/components/WordHeader.vue";
+import WordStats from "~/components/WordStats.vue";
 import { useWords } from "~/composables/useWords";
 import { useAuth } from "~/composables/useAuth";
 
