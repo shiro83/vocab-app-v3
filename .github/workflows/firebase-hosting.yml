@@ -6,34 +6,24 @@ on:
       - main
 
 jobs:
-  build_and_deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
+      - uses: actions/checkout@v3
 
       - name: Install dependencies
         run: npm ci
 
       - name: Build
         run: npm run build
-        
-      - name: Deploy to Firebase Hosting (debug)
-        run: |
-              npm install -g firebase-tools
-              firebase --debug deploy --only hosting --project vocab-app-a20cc
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
 
-      - name: Deploy to Firebase
+      - name: Write service account key
+        run: echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > $GITHUB_WORKSPACE/service-account.json
+
+      - name: Deploy to Firebase Hosting
         run: |
           npm install -g firebase-tools
-          firebase deploy --only hosting --project $FIREBASE_PROJECT_ID
+          firebase deploy --only hosting --project vocab-app-a20cc
         env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          FIREBASE_PROJECT_ID: vocab-app-a20cc   # ← Firebase のプロジェクトID
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/service-account.json
+
