@@ -29,4 +29,4 @@ jobs:
           firebase deploy --only hosting --project $FIREBASE_PROJECT_ID
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          FIREBASE_PROJECT_ID: your-project-id   # ← Firebase のプロジェクトID
+          FIREBASE_PROJECT_ID: vocab-app-a20cc   # ← Firebase のプロジェクトID
