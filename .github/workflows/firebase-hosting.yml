@@ -1,9 +1,9 @@
-name: Deploy to Firebase Hosting v2
+name: Deploy to Firebase Hosting v3
 
 on:
   push:
     branches:
-      - mains
+      - main
 
 jobs:
   build-and-deploy:
