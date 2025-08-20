@@ -1,10 +1,4 @@
 <template>
-  <div
-    class="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-500 to-purple-600 text-white"
-  >
-    <h1 class="text-4xl font-bold">🎉 Tailwind CSS OK</h1>
-  </div>
-  <div class="text-3xl text-blue-500 font-bold">Tailwind テスト</div>
   <div class="p-4">
     <h1 class="text-2xl font-bold mb-4">📘 単語暗記帳</h1>
 

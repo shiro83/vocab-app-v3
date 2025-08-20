@@ -6,16 +6,6 @@ exports[`WordsPage.vue > matches snapshot 1`] = `
     class="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50"
   >
     <!-- ヘッダー -->
-    <!-- 元のコード（削除） -->
-    <!-- 
-&lt;header class="bg-gradient-to-r from-blue-500 to-purple-600 text-white py-4 shadow"&gt;
-  &lt;div class="max-w-2xl mx-auto px-6 flex justify-between items-center"&gt;
-    &lt;h1 class="text-3xl font-bold"&gt;📘 単語暗記帳&lt;/h1&gt;
-    &lt;div class="text-sm"&gt;📊 {{ words.length }}語登録済み&lt;/div&gt;
-  &lt;/div&gt;
-&lt;/header&gt;
--->
-    <!-- 新しいコンポーネントの使用 -->
     <header
       class="bg-gradient-to-r from-blue-500 to-purple-600 text-white py-4 shadow"
     >
@@ -38,24 +28,6 @@ exports[`WordsPage.vue > matches snapshot 1`] = `
       class="max-w-2xl mx-auto p-6"
     >
       <!-- 統計情報 -->
-      <!-- 元のコード（削除） -->
-      <!-- 
-&lt;div class="grid grid-cols-3 gap-4 mb-6"&gt;
-  &lt;div class="bg-white rounded-lg p-4 text-center shadow"&gt;
-    &lt;div class="text-2xl font-bold text-blue-600"&gt;{{ words.length }}&lt;/div&gt;
-    &lt;div class="text-sm text-gray-600"&gt;総単語数&lt;/div&gt;
-  &lt;/div&gt;
-  &lt;div class="bg-white rounded-lg p-4 text-center shadow"&gt;
-    &lt;div class="text-2xl font-bold text-green-600"&gt;{{ memorizedCount }}&lt;/div&gt;
-    &lt;div class="text-sm text-gray-600"&gt;習得済み&lt;/div&gt;
-  &lt;/div&gt;
-  &lt;div class="bg-white rounded-lg p-4 text-center shadow"&gt;
-    &lt;div class="text-2xl font-bold text-orange-600"&gt;{{ studyingCount }}&lt;/div&gt;
-    &lt;div class="text-sm text-gray-600"&gt;学習中&lt;/div&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
--->
-      <!-- 新しいコンポーネントの使用 -->
       <div
         class="grid grid-cols-3 gap-4 mb-6"
       >
@@ -102,7 +74,7 @@ exports[`WordsPage.vue > matches snapshot 1`] = `
           </div>
         </div>
       </div>
-      <!-- 単語追加フォーム -->
+      <!-- 単語追加フォーム） -->
       <div
         class="bg-white rounded-2xl shadow-lg p-6 mb-8"
       >
