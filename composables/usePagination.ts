@@ -1,4 +1,4 @@
-// composables/usePagination.ts
+// ~/composables/usePagination.ts
 import { ref, computed, watch, type Ref } from "vue";
 
 export function usePagination<T>(items: Ref<T[]>, itemsPerPage: number = 10) {
@@ -14,14 +14,34 @@ export function usePagination<T>(items: Ref<T[]>, itemsPerPage: number = 10) {
     return items.value.slice(start, end);
   });
 
-  // アイテムが変更されたときに現在のページを調整
-  watch(items, () => {
-    if (currentPage.value > totalPages.value && totalPages.value > 0) {
-      currentPage.value = totalPages.value;
+  // アイテム数が変更された時にページをリセット
+  watch(
+    () => items.value.length,
+    () => {
+      if (currentPage.value > totalPages.value && totalPages.value > 0) {
+        currentPage.value = 1;
+      }
     }
-  });
+  );
 
-  // ページを最初にリセットする関数
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages.value) {
+      currentPage.value = page;
+    }
+  };
+
+  const nextPage = () => {
+    if (currentPage.value < totalPages.value) {
+      currentPage.value++;
+    }
+  };
+
+  const prevPage = () => {
+    if (currentPage.value > 1) {
+      currentPage.value--;
+    }
+  };
+
   const resetPage = () => {
     currentPage.value = 1;
   };
@@ -29,7 +49,10 @@ export function usePagination<T>(items: Ref<T[]>, itemsPerPage: number = 10) {
   return {
     currentPage,
     totalPages,
-    paginatedItems,
+    paginatedItems: paginatedItems as Ref<T[]>,
+    goToPage,
+    nextPage,
+    prevPage,
     resetPage,
   };
 }
